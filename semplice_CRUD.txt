@@ -1,0 +1,51 @@
+SpringBoot da Explise Instlalazione e progetto
+	Marketplace Menu
+	-Spring Tools 4
+	-File -> New project -> Other -> Spring Starter Project = SIto web da cui creare file MAVEN per inizializzare progetto
+		Maven = strumento gestione dipendenze per Java
+	Nome progetto, versione Java 11
+	Che componenti selezionare per spring boot project? 
+	Ci serviranno: Spring Web, MySql Driver, Spring Data JPA (converte classi java in tabella MySQL), Lombok (automatizza codice)
+	-> next -> finish
+
+Configurazione connessione Database	
+	src/main/resources -> application.properties (contiene file d'impostazione del progetto)
+	Ci scriviamo: 
+		spring.jpa.hibernate.ddl-auto = update //se nel database creo un'entità che non esista JPA lo genera automaticamente
+		spring.datasource.url = jdbc:mysql://${MYSQL_HOST:localhost}:3306/db_example
+		spring.datasource.username = springuser
+		spring.datasource.password = THEPASSWORD
+	PHPMyAdmin -> creo database db_example (nome preso in spring.datasource.url)
+
+Avvio progetto -> si apre un BootDashboard in basso -> clicco destro sul progetto e faccio 'restart'
+	In source si è creata una classe
+	Che ruolo ha questa classe all'interno del sistema?
+		Creo un oggetto che venga poi mappato su una tabella tramite JPA-> scrivi '@Entity' la riga prima di 'public class Note{'
+		'private @ID @GeneratedValue Long id; //sto dicendo a JPA che la variabile è chiave primaria e un valore generato dal server
+		 'private String title;'
+		altri campi...
+		Se avvio l'applicazione creo una tabella con titoli ID, title, altri campi...
+		Vuota perchè non è stata popolata
+
+Creiamo interfaccia attraverso cui il COntroller interagirà col database
+	In source creiamo una interfaccia 
+	'public interface NoteRepository extends CrudRepository<Note, Long>{' //dove Note (T) è l'oggetto manipolato dall'interfaccia, e Long è il tipo della chiave
+	Per manipolare poi l'oggetto ci serviranno i getter e i setter, perciò scriviamo nella classe Note '@Data' (che automaticamente li genera)
+	l'interfaccia NoteRepository è vuota e così rimarrà
+		Sarà Hibyrnate a creare i metodi che serviranno al nostro controller
+		
+Controller (Serve a gestire automaticamente le richieste HTTP tipo PUT/POst/GET ma dev'essere abbinato ad un'interfaccia)
+	Criamo una classe Java di nome 'NoteController.java', ci scriviamo '@RestController', che serve alla classe principale per caricare il componente a runtime automaticamente
+		'private final NoteRepository noteRepository; //l'interfaccia
+		costruttore riceve NoteRepository come input
+			'@GetMapping("/notes")' per segnalare che con URL = 'indirizzoIP/notes' stai chiamando la funzione subito dopo
+				Iterable<Note> getNotes(){return noteRepository.findAll();} //recupera tutte le note (in un iterable, il quale è tipo una lista)
+				indirizzoIP/notes chiama getNotes();
+			'@PostMapping("/notes")' //URL crea un mapping QUANDO VIENE FATTA UNA POST (scrive una tabella)
+			Note createNote(@RequestBody Note newNote){return noteRepository.save(newNote)} //requestBody prende il dato del POST
+				PER TESTARE LA POST USO UN SOFTWARE CHIAMATO 'Postman' MOLTO SEMPLICE DA USARE
+
+
+
+
+
